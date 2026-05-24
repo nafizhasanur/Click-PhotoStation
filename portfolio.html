@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Works - Click-PhotoStation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <style>
+    .portfolio-item { transition: all 0.4s ease; }
+    .portfolio-item:hover { transform: scale(1.05); }
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-indigo-600">Click<span class="text-gray-800">PhotoStation</span></h1>
+      <div class="hidden md:flex space-x-8 text-gray-700">
+        <a href="index.html" class="hover:text-indigo-600">Home</a>
+        <a href="about.html" class="hover:text-indigo-600">About</a>
+        <a href="portfolio.html" class="text-indigo-600 font-medium">Our Works</a>
+        <a href="contact.html" class="hover:text-indigo-600">Contact</a>
+        <a href="new-order.html" class="bg-indigo-600 text-white px-6 py-2 rounded-2xl hover:bg-indigo-700 transition"> Order Now </a>
+      </div>
+      <button id="mobile-menu-btn" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+    <div class="flex flex-col py-4 px-6 space-y-4">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="portfolio.html" class="text-indigo-600">Our Works</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-up">Our Works</h2>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <!-- ==================== PHOTO ITEMS (10) ==================== -->
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow cursor-pointer" data-aos="fade-up" onclick="showLightbox(this)">
+          <img src="images/dukkhobilash new catalog 02.webp" class="w-full h-64 object-cover">
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">LOVE BREAKS SILENCE</h3><h4>Facebook Post · <a href="https://www.facebook.com/dukkhobilasss">Dukkhobilash</a></h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow cursor-pointer" data-aos="fade-up" data-aos-delay="100" onclick="showLightbox(this)">
+          <img src="images/dukkhobilash new catalog 03.webp" class="w-full h-64 object-cover">
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">BEYOND WORDS</h3><h4>Facebook Post · <a href="https://www.facebook.com/dukkhobilasss">Dukkhobilash</a></h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow cursor-pointer" data-aos="fade-up" data-aos-delay="200" onclick="showLightbox(this)">
+          <img src="images/pakhi spotify cover.webp" class="w-full h-64 object-cover">
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">Pakhi Song's </h3><h4><a href="https://open.spotify.com/track/13Q8gsepShHiZLrzEgazkc">Spotify Cover</a> · <a href="https://www.youtube.com/@leon_khandakerr">Leon Khandaker</a></h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow cursor-pointer" data-aos="fade-up" onclick="showLightbox(this)">
+          <img src="images/ural ponkhi spotify cover.webp" class="w-full h-64 object-cover">
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">Ural Ponkhi Song's </h3><h4><a href="https://open.spotify.com/track/4iPx0G90JeuqFcU65gYFNR">Spotify Cover</a> · <a href="https://www.youtube.com/@suffizm">SUFFIZM Band</a></h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow cursor-pointer" data-aos="fade-up" data-aos-delay="100" onclick="showLightbox(this)">
+          <img src="images/dukkhobilash new catalog 04.png" class="w-full h-64 object-cover">
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">QUIETLY DEVOTED</h3><h4>Facebook Post · <a href="https://www.facebook.com/dukkhobilasss">Dukkhobilash</a></h4>
+          </div>
+        </div>
+
+        
+
+        <!-- ==================== VIDEO ITEMS (10) ==================== -->
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow" data-aos="fade-up" data-aos-delay="100">
+          <div class="aspect-video">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/MlnAAk94tBM?si=qHK0IX7QcSze2qq0" title="Pakhi Vol. 01" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg"><a href="https://youtu.be/_2MHBONcibI?si=x8KRfFwENVdFFrW0">Pakhi Vol. 01</a> </h3><h4>Vertical Short Film · <a href="https://www.youtube.com/@leon_khandakerr">Leon Khandaker</a></h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow" data-aos="fade-up" data-aos-delay="200">
+          <div class="aspect-video">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/ol5bB19__ec?si=7fF3hWpKvoETWV5H" title="Meow Meow Lyrical Music Video" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">Meow Meow</h3><h4>Lyrical Music Video · Phonk Edit</h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow" data-aos="fade-up">
+          <div class="aspect-video">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/lPtoWNbPmlk?si=AILiCYq-1lEocwxI" title="Meow Meow Cinematic Visual" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">Meow Meow</h3><h4>Cinematic Visual · Phonk Edit</h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow" data-aos="fade-up" data-aos-delay="200">
+          <div class="aspect-video">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/9RteCFOh9PM?si=nLWvR14kO7tOZzCU" title="Mountain Roads" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg">Mountain Roads</h3><h4>Gaming Edit · <a href="https://www.youtube.com/@NEXTSTOP_bus">NextStop</a> · Bus Simulator Indonesia</h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow" data-aos="fade-up">
+          <div class="aspect-video">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/3ELNdY2rL7o?si=HzCsdSdKOWFtMQIY" title="Pakhi Vol. 02" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg"><a href="https://youtu.be/_2MHBONcibI?si=x8KRfFwENVdFFrW0">Pakhi Vol. 02</a></h3><h4>Vertical Short Film · <a href="https://www.youtube.com/@leon_khandakerr">Leon Khandaker</a></h4>
+          </div>
+        </div>
+
+        <div class="portfolio-item bg-white rounded-2xl overflow-hidden shadow" data-aos="fade-up" data-aos-delay="100">
+          <div class="aspect-video">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/k7jMTg2HS4E?si=h_mzXj_1Ir6aZxNH" title="Ural Ponkhi Cut 01" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <div class="p-5 text-center">
+            <h3 class="font-semibold text-lg"><a href="https://youtu.be/Z1fEqFg1stE?si=BFe_Mg0MnjVg7lhn">Ural Ponkhi Cut 01</a> </h3><h4>Vertical Short Film · <a href="https://www.youtube.com/@suffizm">SUFFIZM</a></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox">
+    <img id="lightbox-image" src="" alt="">
+    <button onclick="closeLightbox()" class="absolute top-8 right-8 text-white text-4xl hover:text-gray-300">×</button>
+  </div>
+
+  <!-- Transparent Footer -->
+  <footer class="bg-gray-900/80 backdrop-blur-md text-gray-300 py-8 text-center border-t border-white/10">
+    <p>© 2026 Click-PhotoStation. All Rights Reserved.</p>
+    <p class="text-sm mt-1">Professional Photo & Video Editing</p>
+  </footer>
+
+  <script>
+    AOS.init({ duration: 1000, once: true });
+
+    function showLightbox(el) {
+      const imgSrc = el.querySelector('img').src;
+      document.getElementById('lightbox-image').src = imgSrc;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    // Mobile Menu
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+  </script>
+</body>
+</html>

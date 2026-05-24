@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Click-PhotoStation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Admin Login -->
+  <div id="admin-login" class="min-h-screen flex items-center justify-center bg-gray-900">
+    <div class="bg-white rounded-3xl shadow-2xl p-10 w-96">
+      <h2 class="text-2xl font-bold text-center mb-8">Admin Login</h2>
+      <input id="admin-password" type="password" placeholder="Enter Admin Password" class="w-full p-4 border rounded-2xl text-center text-lg mb-6">
+      <button onclick="checkAdminLogin()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-semibold">Enter Admin Panel</button>
+    </div>
+  </div>
+
+  <!-- Main Admin Panel -->
+  <div id="admin-panel" class="hidden flex h-screen">
+
+    <!-- Sidebar -->
+    <div class="w-72 bg-gray-900 text-white p-6">
+      <h1 class="text-2xl font-bold mb-8">Admin Panel</h1>
+      <button onclick="showSection('clients')" class="w-full bg-indigo-600 py-3 rounded-xl font-medium mb-3">All Clients</button>
+      <button onclick="showSection('neworders')" class="w-full bg-amber-600 py-3 rounded-xl font-medium mb-3">📥 New Orders</button>
+      
+      <button onclick="showExportModal()" class="w-full bg-emerald-600 py-3 rounded-xl font-medium mt-6">
+        📄 Export to PDF
+      </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8 overflow-auto">
+      <h2 id="main-title" class="text-3xl font-bold mb-6">All Clients & Orders</h2>
+
+      <!-- Add / Edit Form -->
+      <div id="add-form" class="hidden bg-white rounded-3xl shadow-xl p-8 mb-8">
+        <h3 id="form-title" class="text-xl font-semibold mb-6">Add / Edit Client</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <input id="new-name" type="text" placeholder="Client Full Name" class="p-4 border rounded-2xl">
+          <input id="new-gmail" type="email" placeholder="Client Gmail" class="p-4 border rounded-2xl">
+          <input id="new-code" type="text" placeholder="Secret Code" class="p-4 border rounded-2xl">
+          <input id="new-videolink" type="text" placeholder="Video Link" class="p-4 border rounded-2xl">
+          <input id="new-deadline" type="date" class="p-4 border rounded-2xl">
+          <select id="new-status" class="p-4 border rounded-2xl">
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+            <option value="Remain">Remain</option>
+            <option value="Cancel">Cancel</option>
+          </select>
+          <input id="new-charges" type="text" placeholder="Charges (৳)" class="p-4 border rounded-2xl">
+          <select id="new-payment" class="p-4 border rounded-2xl">
+            <option value="Pending">Pending</option>
+            <option value="Paid">Paid</option>
+          </select>
+          <input id="new-progress" type="number" min="0" max="100" placeholder="Progress (%)" class="p-4 border rounded-2xl">
+          <textarea id="new-comment" placeholder="Admin Comment (Visible to Customer)" class="p-4 border rounded-2xl md:col-span-2" rows="3"></textarea>
+        </div>
+        <div class="mt-6 flex gap-4">
+          <button onclick="saveClient()" id="save-btn" class="bg-green-600 text-white px-8 py-3 rounded-2xl">Save</button>
+          <button onclick="hideAddForm()" class="bg-gray-500 text-white px-8 py-3 rounded-2xl">Cancel</button>
+        </div>
+      </div>
+
+      <!-- New Orders List -->
+      <div id="new-orders-list" class="hidden space-y-4"></div>
+
+      <!-- Clients List -->
+      <div id="clients-list" class="space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="export-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-md">
+      <h3 class="text-xl font-bold mb-6">Export Orders to PDF</h3>
+      <div class="space-y-4">
+        <input type="date" id="start-date" class="w-full p-4 border rounded-2xl">
+        <input type="date" id="end-date" class="w-full p-4 border rounded-2xl">
+      </div>
+      <div class="mt-6 flex gap-4">
+        <button onclick="exportToPDF()" class="flex-1 bg-emerald-600 text-white py-3 rounded-2xl">Download PDF</button>
+        <button onclick="closeExportModal()" class="flex-1 bg-gray-500 text-white py-3 rounded-2xl">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_PASSWORD = "admin123";
+
+    let clients = JSON.parse(localStorage.getItem('clients')) || [];
+    let newOrders = JSON.parse(localStorage.getItem('newOrders')) || [];
+    let editingIndex = -1;
+    let newOrdersInterval = null;
+
+    function saveToStorage() {
+      localStorage.setItem('clients', JSON.stringify(clients));
+      localStorage.setItem('newOrders', JSON.stringify(newOrders));
+    }
+
+    function checkAdminLogin() {
+      if (document.getElementById('admin-password').value === ADMIN_PASSWORD) {
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
+        showSection('clients');
+      } else {
+        alert("❌ Wrong Password!");
+      }
+    }
+
+    function showSection(section) {
+      document.getElementById('clients-list').classList.toggle('hidden', section !== 'clients');
+      document.getElementById('new-orders-list').classList.toggle('hidden', section !== 'neworders');
+      document.getElementById('main-title').textContent = section === 'clients' ? "All Clients & Orders" : "📥 New Orders";
+      
+      if (section === 'clients') renderClients();
+      else renderNewOrders();
+    }
+
+    // ================== AUTO REFRESH EVERY 10 SECONDS ==================
+    function startNewOrdersAutoRefresh() {
+      if (newOrdersInterval) clearInterval(newOrdersInterval);
+      newOrdersInterval = setInterval(() => {
+        newOrders = JSON.parse(localStorage.getItem('newOrders')) || [];
+        renderNewOrders();
+      }, 10000); // 10 seconds
+    }
+    // ============================================================
+
+    function renderClients() {
+      const container = document.getElementById('clients-list');
+      container.innerHTML = clients.map((client, index) => `
+        <div class="bg-white rounded-3xl shadow p-6">
+          <div class="grid md:grid-cols-7 gap-4 items-center">
+            <div>
+              <p class="font-medium">${client.name || 'No Name'}</p>
+              <p class="text-sm text-gray-500">${client.gmail}</p>
+            </div>
+            <div class="md:col-span-2">
+              <a href="${client.videoLink || '#'}" target="_blank" class="text-blue-600 hover:underline">View Video</a>
+            </div>
+            <div>${client.deadline || 'N/A'}</div>
+            <div>
+              <span class="px-4 py-1 rounded-full text-sm ${client.status === 'Done' ? 'bg-green-100 text-green-700' : client.status.includes('Cancel') ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}">
+                ${client.status}
+              </span>
+            </div>
+            <div>৳ ${client.charges || '0'}</div>
+            <div class="flex gap-2">
+              <button onclick="editClient(${index})" class="bg-indigo-600 text-white px-5 py-2 rounded-2xl text-sm">Edit</button>
+              <button onclick="deleteClient(${index})" class="bg-red-600 text-white px-5 py-2 rounded-2xl text-sm">Delete</button>
+            </div>
+          </div>
+          ${client.adminComment ? `<div class="mt-4 p-3 bg-gray-50 rounded-xl text-sm"><strong>Admin Comment:</strong> ${client.adminComment}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function renderNewOrders() {
+      const container = document.getElementById('new-orders-list');
+      container.innerHTML = newOrders.map((order, index) => `
+        <div class="bg-white rounded-3xl shadow p-6">
+          <div class="grid md:grid-cols-6 gap-4 items-center">
+            <div>
+              <p class="font-medium">${order.name}</p>
+              <p class="text-sm text-gray-500">${order.gmail}</p>
+            </div>
+            <div class="md:col-span-2">
+              <a href="${order.driveLink}" target="_blank" class="text-blue-600 hover:underline">Drive Link</a>
+            </div>
+            <div>${order.deadline}</div>
+            <div class="text-amber-600 font-medium">New Order</div>
+            <div class="flex gap-2">
+              <button onclick="confirmNewOrder(${index})" class="bg-green-600 text-white px-6 py-2 rounded-2xl text-sm">Confirm</button>
+              <button onclick="cancelNewOrder(${index})" class="bg-red-600 text-white px-6 py-2 rounded-2xl text-sm">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function confirmNewOrder(index) {
+      const order = newOrders[index];
+      const newClient = {
+        name: order.name,
+        gmail: order.gmail,
+        code: "C" + Math.floor(100000 + Math.random() * 900000),
+        videoLink: order.driveLink,
+        deadline: order.deadline,
+        status: "Pending Customer Confirmation",
+        charges: "0",
+        payment: "Pending",
+        progress: 0,
+        adminComment: ""
+      };
+      clients.push(newClient);
+      newOrders.splice(index, 1);
+      saveToStorage();
+      alert(`✅ Confirmed! Code: ${newClient.code}`);
+      renderNewOrders();
+      renderClients();
+    }
+
+    function cancelNewOrder(index) {
+      if (confirm("Cancel this order?")) {
+        newOrders.splice(index, 1);
+        saveToStorage();
+        renderNewOrders();
+      }
+    }
+
+    function deleteClient(index) {
+      if (confirm("Are you sure you want to delete this client?")) {
+        clients.splice(index, 1);
+        saveToStorage();
+        renderClients();
+      }
+    }
+
+    function showExportModal() {
+      document.getElementById('export-modal').classList.remove('hidden');
+    }
+
+    function closeExportModal() {
+      document.getElementById('export-modal').classList.add('hidden');
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+
+      doc.setFontSize(18);
+      doc.text("Click-PhotoStation - Orders Report", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Date Range: ${startDate} to ${endDate}`, 20, 30);
+
+      let y = 50;
+      clients.forEach(client => {
+        doc.text(`Name: ${client.name || 'N/A'}`, 20, y);
+        doc.text(`Gmail: ${client.gmail}`, 20, y+10);
+        doc.text(`Deadline: ${client.deadline || 'N/A'}`, 20, y+20);
+        doc.text(`Status: ${client.status}`, 20, y+30);
+        doc.text(`Charges: ৳ ${client.charges || '0'}`, 20, y+40);
+        y += 55;
+      });
+
+      doc.save("orders_report.pdf");
+      closeExportModal();
+    }
+
+    function showAddForm() {
+      editingIndex = -1;
+      document.getElementById('form-title').textContent = "Add New Client";
+      document.getElementById('save-btn').textContent = "Save";
+      document.getElementById('add-form').classList.remove('hidden');
+      clearForm();
+    }
+
+    function hideAddForm() {
+      document.getElementById('add-form').classList.add('hidden');
+    }
+
+    function clearForm() {
+      document.getElementById('new-name').value = '';
+      document.getElementById('new-gmail').value = '';
+      document.getElementById('new-code').value = '';
+      document.getElementById('new-videolink').value = '';
+      document.getElementById('new-deadline').value = '';
+      document.getElementById('new-status').value = 'In Progress';
+      document.getElementById('new-charges').value = '';
+      document.getElementById('new-payment').value = 'Pending';
+      document.getElementById('new-progress').value = '';
+      document.getElementById('new-comment').value = '';
+    }
+
+    function saveClient() {
+      const clientData = {
+        name: document.getElementById('new-name').value,
+        gmail: document.getElementById('new-gmail').value,
+        code: document.getElementById('new-code').value,
+        videoLink: document.getElementById('new-videolink').value,
+        deadline: document.getElementById('new-deadline').value,
+        status: document.getElementById('new-status').value,
+        charges: document.getElementById('new-charges').value,
+        payment: document.getElementById('new-payment').value,
+        progress: parseInt(document.getElementById('new-progress').value) || 0,
+        adminComment: document.getElementById('new-comment').value
+      };
+
+      if (!clientData.gmail || !clientData.code) {
+        alert("Gmail and Code are required!");
+        return;
+      }
+
+      if (editingIndex >= 0) {
+        clients[editingIndex] = clientData;
+      } else {
+        clients.push(clientData);
+      }
+
+      saveToStorage();
+      renderClients();
+      hideAddForm();
+      alert("✅ Saved Successfully!");
+    }
+
+    function editClient(index) {
+      editingIndex = index;
+      const client = clients[index];
+      document.getElementById('form-title').textContent = "Edit Client";
+      document.getElementById('save-btn').textContent = "Update";
+
+      document.getElementById('new-name').value = client.name || '';
+      document.getElementById('new-gmail').value = client.gmail;
+      document.getElementById('new-code').value = client.code;
+      document.getElementById('new-videolink').value = client.videoLink || '';
+      document.getElementById('new-deadline').value = client.deadline || '';
+      document.getElementById('new-status').value = client.status;
+      document.getElementById('new-charges').value = client.charges || '';
+      document.getElementById('new-payment').value = client.payment || 'Pending';
+      document.getElementById('new-progress').value = client.progress || 0;
+      document.getElementById('new-comment').value = client.adminComment || '';
+
+      document.getElementById('add-form').classList.remove('hidden');
+    }
+
+    // Initialize
+    window.onload = () => {
+      renderClients();
+      if (document.getElementById('admin-panel').classList.contains('hidden') === false) {
+        startNewOrdersAutoRefresh();
+      }
+    };
+  </script>
+</body>
+</html>

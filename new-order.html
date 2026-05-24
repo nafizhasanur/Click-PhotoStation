@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Order - Click-PhotoStation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-2xl mx-auto p-6 pt-12">
+    <div class="bg-white rounded-3xl shadow-2xl p-8">
+      <h1 class="text-3xl font-bold text-center text-indigo-600 mb-8">Place New Video Editing Order</h1>
+      
+      <form id="order-form" class="space-y-6">
+        <input type="text" id="order-name" placeholder="Your Full Name *" required class="w-full p-4 border rounded-2xl">
+        <input type="email" id="order-gmail" placeholder="Your Gmail *" required class="w-full p-4 border rounded-2xl">
+        <input type="tel" id="order-whatsapp" placeholder="WhatsApp Number *" required class="w-full p-4 border rounded-2xl">
+        
+        <input type="url" id="order-drive" placeholder="Google Drive Link (Raw Footage) *" required class="w-full p-4 border rounded-2xl">
+        
+        <textarea id="order-description" rows="4" placeholder="Project Details (What kind of editing do you want?)" required class="w-full p-4 border rounded-2xl"></textarea>
+        
+        <input type="url" id="order-sample" placeholder="Sample Video Link (Optional)" class="w-full p-4 border rounded-2xl">
+        
+        <div>
+          <label class="block text-sm font-medium mb-2">Desired Deadline</label>
+          <input type="date" id="order-deadline" required class="w-full p-4 border rounded-2xl">
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl text-lg font-semibold">
+          Submit Order
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Screen -->
+  <div id="success-screen" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+    <div class="text-center text-white">
+      <div class="flash"></div>
+      <div class="text-7xl mb-6">🎉</div>
+      <h2 class="text-4xl font-bold">Thank You!</h2>
+      <p class="text-xl mt-3">Your order has been received successfully.</p>
+    </div>
+  </div>
+
+  <style>
+    .flash { position: absolute; inset: 0; background: white; opacity: 0; animation: flash 1.4s ease-in-out; }
+    @keyframes flash { 0%{opacity:0.8} 50%{opacity:0.95} 100%{opacity:0} }
+  </style>
+
+  <script>
+    document.getElementById('order-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const orderData = {
+        id: Date.now(),
+        name: document.getElementById('order-name').value,
+        gmail: document.getElementById('order-gmail').value,
+        whatsapp: document.getElementById('order-whatsapp').value,
+        driveLink: document.getElementById('order-drive').value,
+        description: document.getElementById('order-description').value,
+        sampleLink: document.getElementById('order-sample').value,
+        deadline: document.getElementById('order-deadline').value,
+        status: "Pending Review",
+        orderDate: new Date().toLocaleDateString('en-GB'),
+        confirmed: false
+      };
+
+      let newOrders = JSON.parse(localStorage.getItem('newOrders')) || [];
+      newOrders.push(orderData);
+      localStorage.setItem('newOrders', JSON.stringify(newOrders));
+
+      document.getElementById('success-screen').classList.remove('hidden');
+
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 2800);
+    });
+  </script>
+</body>
+</html>
