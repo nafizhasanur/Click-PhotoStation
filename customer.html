@@ -49,7 +49,7 @@
           <p id="charges" class="font-semibold text-lg mt-2"></p>
         </div>
 
-        <!-- নতুন যোগ করা হলো -->
+        <!-- Newly Added -->
         <div class="bg-white border border-gray-200 rounded-2xl p-6">
           <h4 class="text-gray-600">Payment Status</h4>
           <p id="payment-status" class="font-semibold mt-1"></p>
@@ -88,7 +88,7 @@
         document.getElementById('progress-text').textContent = `${progress}% Completed`;
       }
 
-      // সব তথ্য দেখানো
+      // Display all information
       document.getElementById('deadline').textContent = currentClient.deadline || "N/A";
       document.getElementById('charges').textContent = `৳ ${currentClient.charges || '0'}`;
       document.getElementById('payment-status').textContent = currentClient.payment || "Pending";

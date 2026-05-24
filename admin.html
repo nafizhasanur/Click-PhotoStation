@@ -29,7 +29,7 @@
       <button onclick="showSection('neworders')" class="w-full bg-amber-600 py-3 rounded-xl font-medium mb-3">📥 New Orders</button>
       
       <button onclick="showExportModal()" class="w-full bg-emerald-600 py-3 rounded-xl font-medium mt-6">
-        📄 Export to PDF
+        Export to PDF
       </button>
     </div>
 
@@ -108,7 +108,7 @@
         document.getElementById('admin-panel').classList.remove('hidden');
         showSection('clients');
       } else {
-        alert("You forgot your own name? 😅");
+        alert("You forgot your own name? ");
       }
     }
 
@@ -200,7 +200,7 @@
       clients.push(newClient);
       newOrders.splice(index, 1);
       saveToStorage();
-      alert(`✅ Confirmed! Code: ${newClient.code}`);
+      alert(` Confirmed! Code: ${newClient.code}`);
       renderNewOrders();
       renderClients();
     }
@@ -307,7 +307,7 @@
       saveToStorage();
       renderClients();
       hideAddForm();
-      alert("✅ Saved Successfully!");
+      alert(" Saved Successfully!");
     }
 
     function editClient(index) {
