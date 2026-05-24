@@ -115,7 +115,7 @@
     function showSection(section) {
       document.getElementById('clients-list').classList.toggle('hidden', section !== 'clients');
       document.getElementById('new-orders-list').classList.toggle('hidden', section !== 'neworders');
-      document.getElementById('main-title').textContent = section === 'clients' ? "All Clients & Orders" : "📥 New Orders";
+      document.getElementById('main-title').textContent = section === 'clients' ? "All Clients & Orders" : "New Orders";
       
       if (section === 'clients') renderClients();
       else renderNewOrders();
