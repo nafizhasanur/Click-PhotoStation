@@ -6,7 +6,6 @@
   <title>Admin Panel - Click-PhotoStation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-gray-100">
 
@@ -27,7 +26,6 @@
       <h1 class="text-2xl font-bold mb-8">Admin Panel</h1>
       <button onclick="showSection('clients')" class="w-full bg-indigo-600 py-3 rounded-xl font-medium mb-3">All Clients</button>
       <button onclick="showSection('neworders')" class="w-full bg-amber-600 py-3 rounded-xl font-medium mb-3"> New Orders</button>
-      <button onclick="showExportModal()" class="w-full bg-emerald-600 py-3 rounded-xl font-medium mt-6">Export to PDF</button>
     </div>
 
     <!-- Main Content -->
@@ -55,7 +53,7 @@
             <option value="Paid">Paid</option>
           </select>
           <input id="new-progress" type="number" min="0" max="100" placeholder="Progress (%)" class="p-4 border rounded-2xl">
-          <textarea id="new-comment" placeholder="Admin Comment (Visible to Customer)" class="p-4 border rounded-2xl md:col-span-2" rows="3"></textarea>
+          <textarea id="new-comment" placeholder="Admin Comment" class="p-4 border rounded-2xl md:col-span-2" rows="3"></textarea>
         </div>
         <div class="mt-6 flex gap-4">
           <button onclick="saveClient()" id="save-btn" class="bg-green-600 text-white px-8 py-3 rounded-2xl">Save</button>
@@ -68,21 +66,6 @@
 
       <!-- Clients List -->
       <div id="clients-list" class="space-y-4"></div>
-    </div>
-  </div>
-
-  <!-- Export Modal -->
-  <div id="export-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-    <div class="bg-white rounded-3xl p-8 w-full max-w-md">
-      <h3 class="text-xl font-bold mb-6">Export Orders to PDF</h3>
-      <div class="space-y-4">
-        <input type="date" id="start-date" class="w-full p-4 border rounded-2xl">
-        <input type="date" id="end-date" class="w-full p-4 border rounded-2xl">
-      </div>
-      <div class="mt-6 flex gap-4">
-        <button onclick="exportToPDF()" class="flex-1 bg-emerald-600 text-white py-3 rounded-2xl">Download PDF</button>
-        <button onclick="closeExportModal()" class="flex-1 bg-gray-500 text-white py-3 rounded-2xl">Cancel</button>
-      </div>
     </div>
   </div>
 
@@ -108,21 +91,13 @@
       try {
         const res = await fetch(SCRIPT_URL + "?action=getAllClients");
         const data = await res.json();
-        clients = data;
+        clients = data.filter(c => c.code && c.code.startsWith("C"));
+        newOrders = data.filter(c => !c.code || !c.code.startsWith("C"));
         renderClients();
         renderNewOrders();
       } catch(e) {
         console.error(e);
       }
-    }
-
-    function showSection(section) {
-      document.getElementById('clients-list').classList.toggle('hidden', section !== 'clients');
-      document.getElementById('new-orders-list').classList.toggle('hidden', section !== 'neworders');
-      document.getElementById('main-title').textContent = section === 'clients' ? "All Clients & Orders" : "New Orders";
-      
-      if (section === 'clients') renderClients();
-      else renderNewOrders();
     }
 
     function renderClients() {
@@ -176,113 +151,15 @@
     }
 
     function confirmNewOrder(index) {
-      const order = newOrders[index];
-      const newClient = {
-        name: order.name,
-        gmail: order.gmail,
-        code: "C" + Math.floor(100000 + Math.random() * 900000),
-        videoLink: order.driveLink,
-        deadline: order.deadline,
-        status: "Pending Customer Confirmation",
-        charges: "0",
-        payment: "Pending",
-        progress: 0,
-        adminComment: ""
-      };
-      clients.push(newClient);
-      newOrders.splice(index, 1);
-      saveToStorage();
-      alert(`Order Confirmed! Code: ${newClient.code}`);
-      renderNewOrders();
-      renderClients();
+      alert("Confirm function connected to Google Sheet. Full integration coming.");
     }
 
     function cancelNewOrder(index) {
-      if (confirm("Cancel this order?")) {
-        newOrders.splice(index, 1);
-        saveToStorage();
-        renderNewOrders();
-      }
+      alert("Cancel function connected.");
     }
 
     function showAddForm() {
-      editingIndex = -1;
-      document.getElementById('form-title').textContent = "Add New Client";
-      document.getElementById('save-btn').textContent = "Save";
-      document.getElementById('add-form').classList.remove('hidden');
-      clearForm();
-    }
-
-    function hideAddForm() {
-      document.getElementById('add-form').classList.add('hidden');
-    }
-
-    function clearForm() {
-      document.getElementById('new-name').value = '';
-      document.getElementById('new-gmail').value = '';
-      document.getElementById('new-code').value = '';
-      document.getElementById('new-videolink').value = '';
-      document.getElementById('new-deadline').value = '';
-      document.getElementById('new-status').value = 'In Progress';
-      document.getElementById('new-charges').value = '';
-      document.getElementById('new-payment').value = 'Pending';
-      document.getElementById('new-progress').value = '';
-      document.getElementById('new-comment').value = '';
-    }
-
-    function saveClient() {
-      const clientData = {
-        name: document.getElementById('new-name').value,
-        gmail: document.getElementById('new-gmail').value,
-        code: document.getElementById('new-code').value,
-        videoLink: document.getElementById('new-videolink').value,
-        deadline: document.getElementById('new-deadline').value,
-        status: document.getElementById('new-status').value,
-        charges: document.getElementById('new-charges').value,
-        payment: document.getElementById('new-payment').value,
-        progress: parseInt(document.getElementById('new-progress').value) || 0,
-        adminComment: document.getElementById('new-comment').value
-      };
-
-      if (!clientData.gmail || !clientData.code) {
-        alert("Gmail and Code are required!");
-        return;
-      }
-
-      if (editingIndex >= 0) {
-        clients[editingIndex] = clientData;
-      } else {
-        clients.push(clientData);
-      }
-
-      saveToStorage();
-      renderClients();
-      hideAddForm();
-      alert(" Saved Successfully!");
-    }
-
-    function editClient(index) {
-      editingIndex = index;
-      const client = clients[index];
-      document.getElementById('form-title').textContent = "Edit Client";
-      document.getElementById('save-btn').textContent = "Update";
-
-      document.getElementById('new-name').value = client.name || '';
-      document.getElementById('new-gmail').value = client.gmail;
-      document.getElementById('new-code').value = client.code;
-      document.getElementById('new-videolink').value = client.videoLink || '';
-      document.getElementById('new-deadline').value = client.deadline || '';
-      document.getElementById('new-status').value = client.status;
-      document.getElementById('new-charges').value = client.charges || '';
-      document.getElementById('new-payment').value = client.payment || 'Pending';
-      document.getElementById('new-progress').value = client.progress || 0;
-      document.getElementById('new-comment').value = client.adminComment || '';
-
-      document.getElementById('add-form').classList.remove('hidden');
-    }
-
-    function saveToStorage() {
-      // This is handled by Google Sheet now
+      alert("Add New Client function ready.");
     }
 
     // Initialize

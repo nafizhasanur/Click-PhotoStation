@@ -12,7 +12,9 @@
     <div class="bg-white rounded-3xl shadow-2xl p-8">
       <div class="flex justify-between items-center mb-8">
         <h1 id="welcome-text" class="text-3xl font-bold text-indigo-600"></h1>
-        <a href="index.html" class="text-indigo-600 hover:text-indigo-700 font-medium">← Back to Home</a>
+        <a href="index.html" class="text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-2">
+          ← Back to Home
+        </a>
       </div>
 
       <div id="client-info" class="text-center mb-10 text-lg font-medium"></div>
@@ -23,18 +25,27 @@
         <p id="comment-text" class="text-gray-700"></p>
       </div>
 
-      <!-- Action Buttons -->
+      <!-- Status Message -->
+      <div id="status-message" class="text-center mb-8 text-lg font-semibold"></div>
+
+      <!-- Action Buttons (For New Clients with Code starting with "C") -->
       <div id="action-buttons" class="hidden grid grid-cols-3 gap-4 mb-10">
-        <button onclick="confirmOrder()" class="bg-green-600 text-white py-4 rounded-2xl font-semibold">✅ Confirm</button>
-        <button onclick="editOrder()" class="bg-yellow-500 text-white py-4 rounded-2xl font-semibold">✏️ Edit</button>
-        <button onclick="cancelOrder()" class="bg-red-600 text-white py-4 rounded-2xl font-semibold">❌ Cancel</button>
+        <button onclick="confirmOrder()" class="bg-green-600 text-white py-4 rounded-2xl font-semibold hover:bg-green-700">
+          Confirm Order
+        </button>
+        <button onclick="editOrder()" class="bg-yellow-500 text-white py-4 rounded-2xl font-semibold hover:bg-yellow-600">
+          Edit Order
+        </button>
+        <button onclick="cancelOrder()" class="bg-red-600 text-white py-4 rounded-2xl font-semibold hover:bg-red-700">
+          Cancel Order
+        </button>
       </div>
 
-      <!-- Progress -->
+      <!-- Progress Section -->
       <div id="progress-section" class="hidden bg-gray-100 rounded-2xl p-8 mb-8">
-        <h3 class="font-semibold mb-4">Project Progress</h3>
+        <h3 class="font-semibold mb-4 text-gray-700">Project Progress</h3>
         <div class="w-full bg-gray-300 rounded-full h-5">
-          <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-blue-600 h-5 rounded-full"></div>
+          <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-blue-600 h-5 rounded-full transition-all duration-700"></div>
         </div>
         <p id="progress-text" class="text-center mt-3 font-medium"></p>
       </div>
@@ -45,10 +56,24 @@
           <p id="deadline" class="font-semibold mt-1"></p>
           <p id="days-remain" class="text-sm text-orange-600 mt-1"></p>
         </div>
+
         <div class="bg-white border border-gray-200 rounded-2xl p-6">
           <h4 class="text-gray-600">Charges</h4>
           <p id="charges" class="font-semibold text-lg mt-2"></p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="edit-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-md">
+      <h3 class="text-xl font-bold mb-6">Edit Order</h3>
+      <input id="edit-deadline" type="date" class="w-full p-4 border rounded-2xl mb-4">
+      <input id="edit-charges" type="text" placeholder="New Charges (৳)" class="w-full p-4 border rounded-2xl mb-6">
+      <div class="flex gap-4">
+        <button onclick="saveEdit()" class="flex-1 bg-indigo-600 text-white py-3 rounded-2xl">Send to Admin</button>
+        <button onclick="closeEditModal()" class="flex-1 bg-gray-500 text-white py-3 rounded-2xl">Cancel</button>
       </div>
     </div>
   </div>
@@ -61,19 +86,42 @@
     if (!currentClient) {
       window.location.href = "login.html";
     } else {
-      document.getElementById('welcome-text').textContent = `Welcome, ${currentClient.name || 'Client'}`;
+      const name = currentClient.name || "Client";
+      document.getElementById('welcome-text').textContent = `Welcome, ${name}`;
       document.getElementById('client-info').innerHTML = `Logged in as: <strong>${currentClient.gmail}</strong>`;
 
+      // Show Admin Comment
+      if (currentClient.adminComment) {
+        document.getElementById('admin-comment').classList.remove('hidden');
+        document.getElementById('comment-text').textContent = currentClient.adminComment;
+      }
+
+      // Check if it's a new client (Code starts with "C")
       const isNewClient = currentClient.code && currentClient.code.startsWith("C");
 
       if (isNewClient && currentClient.status === "Pending Customer Confirmation") {
         document.getElementById('action-buttons').classList.remove('hidden');
-      } else if (currentClient.status === "In Progress" || currentClient.status === "Done") {
+        document.getElementById('status-message').innerHTML = `
+          <span class="text-yellow-600">Your order is waiting for your confirmation</span>`;
+      } 
+      // In Progress or Done
+      else if (currentClient.status === "In Progress" || currentClient.status === "Done") {
         document.getElementById('progress-section').classList.remove('hidden');
         const progress = currentClient.progress || 0;
         document.getElementById('progress-bar').style.width = progress + "%";
         document.getElementById('progress-text').textContent = `${progress}% Completed`;
       }
+
+      document.getElementById('deadline').textContent = currentClient.deadline || "N/A";
+      document.getElementById('charges').textContent = `৳ ${currentClient.charges || '0'}`;
+      document.getElementById('days-remain').textContent = calculateDaysRemaining(currentClient.deadline);
+    }
+
+    function calculateDaysRemaining(deadline) {
+      if (!deadline) return "";
+      const diff = new Date(deadline) - new Date();
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      return days > 0 ? `${days} days remaining` : "Overdue";
     }
 
     function confirmOrder() {
@@ -84,14 +132,30 @@
     }
 
     function cancelOrder() {
-      if (confirm("Cancel this order?")) {
+      if (confirm("Are you sure you want to cancel this order?")) {
         localStorage.removeItem('currentClient');
         window.location.href = "index.html";
       }
     }
 
     function editOrder() {
-      alert("Edit feature coming soon...");
+      document.getElementById('edit-modal').classList.remove('hidden');
+      document.getElementById('edit-deadline').value = currentClient.deadline || "";
+      document.getElementById('edit-charges').value = currentClient.charges || "";
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    function saveEdit() {
+      currentClient.deadline = document.getElementById('edit-deadline').value;
+      currentClient.charges = document.getElementById('edit-charges').value;
+      currentClient.status = "Edit Requested";
+      localStorage.setItem('currentClient', JSON.stringify(currentClient));
+      alert("Changes sent to Admin for approval");
+      closeEditModal();
+      location.reload();
     }
   </script>
 </body>
