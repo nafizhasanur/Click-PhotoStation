@@ -27,7 +27,7 @@
           <input type="date" id="order-deadline" required class="w-full p-4 border rounded-2xl">
         </div>
 
-        <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl text-lg font-semibold">
+        <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white py-4 rounded-2xl text-lg font-semibold">
           Submit Order
         </button>
       </form>
@@ -37,7 +37,7 @@
   <!-- Success Screen -->
   <div id="success-screen" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
     <div class="text-center text-white">
-      <div class="text-7xl mb-6"> <img src="images/about us.webp" class="rounded-2xl shadow-xl" alt="Click-PhotoStation logo"></div>
+      <div class="text-7xl mb-6"></div>
       <h2 class="text-4xl font-bold">Thank You!</h2>
       <p class="text-xl mt-3">Your order has been received successfully.</p>
     </div>
@@ -48,6 +48,10 @@
 
     document.getElementById('order-form').addEventListener('submit', async function(e) {
       e.preventDefault();
+
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.innerHTML = 'Submitting...';
+      submitBtn.disabled = true;
 
       const orderData = {
         name: document.getElementById('order-name').value,
@@ -62,7 +66,10 @@
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
-          body: JSON.stringify({ action: "addNewOrder", order: orderData }),
+          body: JSON.stringify({ 
+            action: "addNewOrder", 
+            order: orderData 
+          }),
           headers: { 'Content-Type': 'application/json' }
         });
 
@@ -70,12 +77,17 @@
 
         if (result.success) {
           document.getElementById('success-screen').classList.remove('hidden');
-          setTimeout(() => window.location.href = "index.html", 2500);
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 2800);
         } else {
           alert("Error: " + (result.message || "Please try again."));
         }
       } catch(e) {
-        alert("Connection error. Please check your internet.");
+        alert("Connection error. Please check your internet and try again.");
+      } finally {
+        submitBtn.innerHTML = 'Submit Order';
+        submitBtn.disabled = false;
       }
     });
   </script>
