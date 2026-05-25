@@ -27,10 +27,7 @@
       <h1 class="text-2xl font-bold mb-8">Admin Panel</h1>
       <button onclick="showSection('clients')" class="w-full bg-indigo-600 py-3 rounded-xl font-medium mb-3">All Clients</button>
       <button onclick="showSection('neworders')" class="w-full bg-amber-600 py-3 rounded-xl font-medium mb-3"> New Orders</button>
-      
-      <button onclick="showExportModal()" class="w-full bg-emerald-600 py-3 rounded-xl font-medium mt-6">
-        Export to PDF
-      </button>
+      <button onclick="showExportModal()" class="w-full bg-emerald-600 py-3 rounded-xl font-medium mt-6">Export to PDF</button>
     </div>
 
     <!-- Main Content -->
@@ -90,25 +87,32 @@
   </div>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby674h-NihIdY-8fUMzaBfZG2U0vmJUIH0UbqL_N2po46zAEtBXBgtM-JJjDNWQyD6BXw/exec";
     const ADMIN_PASSWORD = "EditorAccess21";
 
-    let clients = JSON.parse(localStorage.getItem('clients')) || [];
-    let newOrders = JSON.parse(localStorage.getItem('newOrders')) || [];
+    let clients = [];
+    let newOrders = [];
     let editingIndex = -1;
-    let newOrdersInterval = null;
-
-    function saveToStorage() {
-      localStorage.setItem('clients', JSON.stringify(clients));
-      localStorage.setItem('newOrders', JSON.stringify(newOrders));
-    }
 
     function checkAdminLogin() {
       if (document.getElementById('admin-password').value === ADMIN_PASSWORD) {
         document.getElementById('admin-login').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
-        showSection('clients');
+        loadData();
       } else {
-        alert("You forgot your own name? ");
+        alert("Wrong Password!");
+      }
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(SCRIPT_URL + "?action=getAllClients");
+        const data = await res.json();
+        clients = data;
+        renderClients();
+        renderNewOrders();
+      } catch(e) {
+        console.error(e);
       }
     }
 
@@ -120,16 +124,6 @@
       if (section === 'clients') renderClients();
       else renderNewOrders();
     }
-
-    // ================== AUTO REFRESH EVERY 10 SECONDS ==================
-    function startNewOrdersAutoRefresh() {
-      if (newOrdersInterval) clearInterval(newOrdersInterval);
-      newOrdersInterval = setInterval(() => {
-        newOrders = JSON.parse(localStorage.getItem('newOrders')) || [];
-        renderNewOrders();
-      }, 10000); // 10 seconds
-    }
-    // ============================================================
 
     function renderClients() {
       const container = document.getElementById('clients-list');
@@ -145,17 +139,15 @@
             </div>
             <div>${client.deadline || 'N/A'}</div>
             <div>
-              <span class="px-4 py-1 rounded-full text-sm ${client.status === 'Done' ? 'bg-green-100 text-green-700' : client.status.includes('Cancel') ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}">
+              <span class="px-4 py-1 rounded-full text-sm ${client.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
                 ${client.status}
               </span>
             </div>
             <div>৳ ${client.charges || '0'}</div>
-            <div class="flex gap-2">
+            <div>
               <button onclick="editClient(${index})" class="bg-indigo-600 text-white px-5 py-2 rounded-2xl text-sm">Edit</button>
-              <button onclick="deleteClient(${index})" class="bg-red-600 text-white px-5 py-2 rounded-2xl text-sm">Delete</button>
             </div>
           </div>
-          ${client.adminComment ? `<div class="mt-4 p-3 bg-gray-50 rounded-xl text-sm"><strong>Admin Comment:</strong> ${client.adminComment}</div>` : ''}
         </div>
       `).join('');
     }
@@ -200,7 +192,7 @@
       clients.push(newClient);
       newOrders.splice(index, 1);
       saveToStorage();
-      alert(` Confirmed! Code: ${newClient.code}`);
+      alert(`Order Confirmed! Code: ${newClient.code}`);
       renderNewOrders();
       renderClients();
     }
@@ -211,47 +203,6 @@
         saveToStorage();
         renderNewOrders();
       }
-    }
-
-    function deleteClient(index) {
-      if (confirm("Are you sure you want to delete this client?")) {
-        clients.splice(index, 1);
-        saveToStorage();
-        renderClients();
-      }
-    }
-
-    function showExportModal() {
-      document.getElementById('export-modal').classList.remove('hidden');
-    }
-
-    function closeExportModal() {
-      document.getElementById('export-modal').classList.add('hidden');
-    }
-
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const startDate = document.getElementById('start-date').value;
-      const endDate = document.getElementById('end-date').value;
-
-      doc.setFontSize(18);
-      doc.text("Click-PhotoStation - Orders Report", 20, 20);
-      doc.setFontSize(12);
-      doc.text(`Date Range: ${startDate} to ${endDate}`, 20, 30);
-
-      let y = 50;
-      clients.forEach(client => {
-        doc.text(`Name: ${client.name || 'N/A'}`, 20, y);
-        doc.text(`Gmail: ${client.gmail}`, 20, y+10);
-        doc.text(`Deadline: ${client.deadline || 'N/A'}`, 20, y+20);
-        doc.text(`Status: ${client.status}`, 20, y+30);
-        doc.text(`Charges: ৳ ${client.charges || '0'}`, 20, y+40);
-        y += 55;
-      });
-
-      doc.save("orders_report.pdf");
-      closeExportModal();
     }
 
     function showAddForm() {
@@ -330,11 +281,14 @@
       document.getElementById('add-form').classList.remove('hidden');
     }
 
+    function saveToStorage() {
+      // This is handled by Google Sheet now
+    }
+
     // Initialize
     window.onload = () => {
-      renderClients();
       if (document.getElementById('admin-panel').classList.contains('hidden') === false) {
-        startNewOrdersAutoRefresh();
+        loadData();
       }
     };
   </script>

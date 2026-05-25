@@ -12,9 +12,7 @@
     <div class="bg-white rounded-3xl shadow-2xl p-8">
       <div class="flex justify-between items-center mb-8">
         <h1 id="welcome-text" class="text-3xl font-bold text-indigo-600"></h1>
-        <a href="index.html" class="text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-2">
-          ← Back to Home
-        </a>
+        <a href="index.html" class="text-indigo-600 hover:text-indigo-700 font-medium">← Back to Home</a>
       </div>
 
       <div id="client-info" class="text-center mb-10 text-lg font-medium"></div>
@@ -25,14 +23,18 @@
         <p id="comment-text" class="text-gray-700"></p>
       </div>
 
-      <!-- Status Message -->
-      <div id="status-message" class="text-center mb-8 text-lg font-semibold"></div>
+      <!-- Action Buttons -->
+      <div id="action-buttons" class="hidden grid grid-cols-3 gap-4 mb-10">
+        <button onclick="confirmOrder()" class="bg-green-600 text-white py-4 rounded-2xl font-semibold">✅ Confirm</button>
+        <button onclick="editOrder()" class="bg-yellow-500 text-white py-4 rounded-2xl font-semibold">✏️ Edit</button>
+        <button onclick="cancelOrder()" class="bg-red-600 text-white py-4 rounded-2xl font-semibold">❌ Cancel</button>
+      </div>
 
-      <!-- Progress Section -->
+      <!-- Progress -->
       <div id="progress-section" class="hidden bg-gray-100 rounded-2xl p-8 mb-8">
-        <h3 class="font-semibold mb-4 text-gray-700">Project Progress</h3>
+        <h3 class="font-semibold mb-4">Project Progress</h3>
         <div class="w-full bg-gray-300 rounded-full h-5">
-          <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-blue-600 h-5 rounded-full transition-all duration-700"></div>
+          <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-blue-600 h-5 rounded-full"></div>
         </div>
         <p id="progress-text" class="text-center mt-3 font-medium"></p>
       </div>
@@ -43,63 +45,35 @@
           <p id="deadline" class="font-semibold mt-1"></p>
           <p id="days-remain" class="text-sm text-orange-600 mt-1"></p>
         </div>
-
         <div class="bg-white border border-gray-200 rounded-2xl p-6">
           <h4 class="text-gray-600">Charges</h4>
           <p id="charges" class="font-semibold text-lg mt-2"></p>
-        </div>
-
-        <!-- Newly Added -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6">
-          <h4 class="text-gray-600">Payment Status</h4>
-          <p id="payment-status" class="font-semibold mt-1"></p>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby674h-NihIdY-8fUMzaBfZG2U0vmJUIH0UbqL_N2po46zAEtBXBgtM-JJjDNWQyD6BXw/exec";
+
     const currentClient = JSON.parse(localStorage.getItem('currentClient'));
 
     if (!currentClient) {
       window.location.href = "login.html";
     } else {
-      const name = currentClient.name || "Client";
-      document.getElementById('welcome-text').textContent = `Welcome, ${name}`;
+      document.getElementById('welcome-text').textContent = `Welcome, ${currentClient.name || 'Client'}`;
       document.getElementById('client-info').innerHTML = `Logged in as: <strong>${currentClient.gmail}</strong>`;
-
-      // Admin Comment
-      if (currentClient.adminComment) {
-        document.getElementById('admin-comment').classList.remove('hidden');
-        document.getElementById('comment-text').textContent = currentClient.adminComment;
-      }
 
       const isNewClient = currentClient.code && currentClient.code.startsWith("C");
 
       if (isNewClient && currentClient.status === "Pending Customer Confirmation") {
         document.getElementById('action-buttons').classList.remove('hidden');
-        document.getElementById('status-message').innerHTML = `
-          <span class="text-yellow-600">Your order is waiting for your confirmation</span>`;
-      } 
-      else if (currentClient.status === "In Progress" || currentClient.status === "Done") {
+      } else if (currentClient.status === "In Progress" || currentClient.status === "Done") {
         document.getElementById('progress-section').classList.remove('hidden');
         const progress = currentClient.progress || 0;
         document.getElementById('progress-bar').style.width = progress + "%";
         document.getElementById('progress-text').textContent = `${progress}% Completed`;
       }
-
-      // Display all information
-      document.getElementById('deadline').textContent = currentClient.deadline || "N/A";
-      document.getElementById('charges').textContent = `৳ ${currentClient.charges || '0'}`;
-      document.getElementById('payment-status').textContent = currentClient.payment || "Pending";
-      document.getElementById('days-remain').textContent = calculateDaysRemaining(currentClient.deadline);
-    }
-
-    function calculateDaysRemaining(deadline) {
-      if (!deadline) return "";
-      const diff = new Date(deadline) - new Date();
-      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-      return days > 0 ? `${days} days remaining` : "Overdue";
     }
 
     function confirmOrder() {
@@ -110,10 +84,14 @@
     }
 
     function cancelOrder() {
-      if (confirm("Are you sure you want to cancel this order?")) {
+      if (confirm("Cancel this order?")) {
         localStorage.removeItem('currentClient');
         window.location.href = "index.html";
       }
+    }
+
+    function editOrder() {
+      alert("Edit feature coming soon...");
     }
   </script>
 </body>

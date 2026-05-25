@@ -19,19 +19,31 @@
   </div>
 
   <script>
-    function handleLogin() {
-      const gmail = document.getElementById('gmail').value.trim();
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby674h-NihIdY-8fUMzaBfZG2U0vmJUIH0UbqL_N2po46zAEtBXBgtM-JJjDNWQyD6BXw/exec";
+
+    async function handleLogin() {
+      const gmail = document.getElementById('gmail').value.trim().toLowerCase();
       const code = document.getElementById('code').value.trim();
 
-      let clients = JSON.parse(localStorage.getItem('clients')) || [];
+      if (!gmail || !code) {
+        alert("Gmail and Code are required!");
+        return;
+      }
 
-      const user = clients.find(c => c.gmail === gmail && c.code === code);
+      try {
+        const res = await fetch(SCRIPT_URL + "?action=getAllClients");
+        const clients = await res.json();
 
-      if (user) {
-        localStorage.setItem('currentClient', JSON.stringify(user));
-        window.location.href = "customer.html";
-      } else {
-        alert("Invalid Gmail or Code! Please check with Admin.");
+        const user = clients.find(c => c.gmail.toLowerCase() === gmail && c.code === code);
+
+        if (user) {
+          localStorage.setItem('currentClient', JSON.stringify(user));
+          window.location.href = "customer.html";
+        } else {
+          alert("Invalid Gmail or Code!\nPlease check with Admin.");
+        }
+      } catch(e) {
+        alert("Connection error. Please try again.");
       }
     }
   </script>

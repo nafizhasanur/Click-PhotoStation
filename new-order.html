@@ -18,7 +18,7 @@
         
         <input type="url" id="order-drive" placeholder="Google Drive Link (Raw Footage) *" required class="w-full p-4 border rounded-2xl">
         
-        <textarea id="order-description" rows="4" placeholder="Project Details (What kind of editing do you want?)" required class="w-full p-4 border rounded-2xl"></textarea>
+        <textarea id="order-description" rows="4" placeholder="Project Details" required class="w-full p-4 border rounded-2xl"></textarea>
         
         <input type="url" id="order-sample" placeholder="Sample Video Link (Optional)" class="w-full p-4 border rounded-2xl">
         
@@ -34,49 +34,46 @@
     </div>
   </div>
 
-  <!-- Success Screen -->
-  <div id="success-screen" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-    <div class="text-center text-white">
-      <div class="flash"></div>
-      <div class="text-7xl mb-6"></div>
-      <h2 class="text-4xl font-bold">Thank You!</h2>
-      <p class="text-xl mt-3">Your order has been received successfully.</p>
-    </div>
-  </div>
-
-  <style>
-    .flash { position: absolute; inset: 0; background: white; opacity: 0; animation: flash 1.4s ease-in-out; }
-    @keyframes flash { 0%{opacity:0.8} 50%{opacity:0.95} 100%{opacity:0} }
-  </style>
-
   <script>
-    document.getElementById('order-form').addEventListener('submit', function(e) {
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby674h-NihIdY-8fUMzaBfZG2U0vmJUIH0UbqL_N2po46zAEtBXBgtM-JJjDNWQyD6BXw/exec";
+
+    document.getElementById('order-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const orderData = {
-        id: Date.now(),
         name: document.getElementById('order-name').value,
         gmail: document.getElementById('order-gmail').value,
         whatsapp: document.getElementById('order-whatsapp').value,
         driveLink: document.getElementById('order-drive').value,
         description: document.getElementById('order-description').value,
         sampleLink: document.getElementById('order-sample').value,
-        deadline: document.getElementById('order-deadline').value,
-        status: "Pending Review",
-        orderDate: new Date().toLocaleDateString('en-GB'),
-        confirmed: false
+        deadline: document.getElementById('order-deadline').value
       };
 
-      let newOrders = JSON.parse(localStorage.getItem('newOrders')) || [];
-      newOrders.push(orderData);
-      localStorage.setItem('newOrders', JSON.stringify(newOrders));
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: "addNewOrder", order: orderData })
+        });
 
-      document.getElementById('success-screen').classList.remove('hidden');
+        document.getElementById('success-screen').classList.remove('hidden');
 
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 2800);
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 2800);
+      } catch(e) {
+        alert("Error submitting order. Please try again.");
+      }
     });
   </script>
+
+  <!-- Success Screen -->
+  <div id="success-screen" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+    <div class="text-center text-white">
+      <div class="text-7xl mb-6"></div>
+      <h2 class="text-4xl font-bold">Thank You!</h2>
+      <p class="text-xl mt-3">Your order has been received successfully.</p>
+    </div>
+  </div>
 </body>
 </html>
