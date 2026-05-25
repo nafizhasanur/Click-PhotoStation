@@ -28,7 +28,7 @@
       <!-- Status Message -->
       <div id="status-message" class="text-center mb-8 text-lg font-semibold"></div>
 
-      <!-- Action Buttons (For New Clients with Code starting with "C") -->
+      <!-- Action Buttons -->
       <div id="action-buttons" class="hidden grid grid-cols-3 gap-4 mb-10">
         <button onclick="confirmOrder()" class="bg-green-600 text-white py-4 rounded-2xl font-semibold hover:bg-green-700">
           Confirm Order
@@ -50,6 +50,14 @@
         <p id="progress-text" class="text-center mt-3 font-medium"></p>
       </div>
 
+      <!-- Final Video Link (Only when 100%) -->
+      <div id="video-section" class="hidden bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
+        <h4 class="font-semibold text-green-700 mb-2">Your Final Edited Video</h4>
+        <a id="final-video-link" href="#" target="_blank" class="text-green-600 hover:underline font-medium">
+          📥 Download / Watch Video
+        </a>
+      </div>
+
       <div class="grid md:grid-cols-2 gap-6">
         <div class="bg-white border border-gray-200 rounded-2xl p-6">
           <h4 class="text-gray-600">Deadline</h4>
@@ -68,7 +76,7 @@
   <!-- Edit Modal -->
   <div id="edit-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
     <div class="bg-white rounded-3xl p-8 w-full max-w-md">
-      <h3 class="text-xl font-bold mb-6">Edit Order</h3>
+      <h3 class="text-xl font-bold mb-6">Edit Order Details</h3>
       <input id="edit-deadline" type="date" class="w-full p-4 border rounded-2xl mb-4">
       <input id="edit-charges" type="text" placeholder="New Charges (৳)" class="w-full p-4 border rounded-2xl mb-6">
       <div class="flex gap-4">
@@ -79,7 +87,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4dWZMRrW_UCeQ0P07KYRmSilmMCT8HrsB1TILNNGpYUMmsxlNkmkVYrsR_xq3CTHnbA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGvsWT1vl05WlrAtLjZIONii4imLDB8EZwwYqa8juNVB8ub0dLl1bI_zdaOB737MlLbw/exec";
 
     const currentClient = JSON.parse(localStorage.getItem('currentClient'));
 
@@ -90,26 +98,29 @@
       document.getElementById('welcome-text').textContent = `Welcome, ${name}`;
       document.getElementById('client-info').innerHTML = `Logged in as: <strong>${currentClient.gmail}</strong>`;
 
-      // Show Admin Comment
+      // Admin Comment
       if (currentClient.adminComment) {
         document.getElementById('admin-comment').classList.remove('hidden');
         document.getElementById('comment-text').textContent = currentClient.adminComment;
       }
 
-      // Check if it's a new client (Code starts with "C")
       const isNewClient = currentClient.code && currentClient.code.startsWith("C");
 
       if (isNewClient && currentClient.status === "Pending Customer Confirmation") {
         document.getElementById('action-buttons').classList.remove('hidden');
-        document.getElementById('status-message').innerHTML = `
-          <span class="text-yellow-600">Your order is waiting for your confirmation</span>`;
+        document.getElementById('status-message').innerHTML = `<span class="text-yellow-600">Your order is waiting for your confirmation</span>`;
       } 
-      // In Progress or Done
       else if (currentClient.status === "In Progress" || currentClient.status === "Done") {
         document.getElementById('progress-section').classList.remove('hidden');
-        const progress = currentClient.progress || 0;
+        const progress = parseInt(currentClient.progress) || 0;
         document.getElementById('progress-bar').style.width = progress + "%";
         document.getElementById('progress-text').textContent = `${progress}% Completed`;
+
+        // Show Final Video Link only when 100%
+        if (progress >= 100 && currentClient.videoLink) {
+          document.getElementById('video-section').classList.remove('hidden');
+          document.getElementById('final-video-link').href = currentClient.videoLink;
+        }
       }
 
       document.getElementById('deadline').textContent = currentClient.deadline || "N/A";

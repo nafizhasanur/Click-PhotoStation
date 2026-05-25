@@ -19,7 +19,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4dWZMRrW_UCeQ0P07KYRmSilmMCT8HrsB1TILNNGpYUMmsxlNkmkVYrsR_xq3CTHnbA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGvsWT1vl05WlrAtLjZIONii4imLDB8EZwwYqa8juNVB8ub0dLl1bI_zdaOB737MlLbw/exec";
 
     async function handleLogin() {
       const gmail = document.getElementById('gmail').value.trim().toLowerCase();
@@ -40,7 +40,7 @@
           localStorage.setItem('currentClient', JSON.stringify(user));
           window.location.href = "customer.html";
         } else {
-          alert("Invalid Gmail or Code!\nPlease talk with Admin.");
+          alert("Invalid Gmail or Code!\nPlease contact Admin.");
         }
       } catch(e) {
         alert("Connection error. Please try again.");
