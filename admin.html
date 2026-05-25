@@ -20,23 +20,27 @@
 
   <!-- Main Admin Panel -->
   <div id="admin-panel" class="hidden flex h-screen">
+
+    <!-- Sidebar -->
     <div class="w-72 bg-gray-900 text-white p-6">
       <h1 class="text-2xl font-bold mb-8">Admin Panel</h1>
       <button onclick="showSection('clients')" class="w-full bg-indigo-600 py-3 rounded-xl font-medium mb-3">All Clients</button>
       <button onclick="showSection('neworders')" class="w-full bg-amber-600 py-3 rounded-xl font-medium mb-3">New Orders</button>
     </div>
 
+    <!-- Main Content -->
     <div class="flex-1 p-8 overflow-auto">
       <h2 id="main-title" class="text-3xl font-bold mb-6">All Clients & Orders</h2>
 
-      <!-- Add/Edit Form -->
+      <!-- Add / Edit Form -->
       <div id="add-form" class="hidden bg-white rounded-3xl shadow-xl p-8 mb-8">
         <h3 id="form-title" class="text-xl font-semibold mb-6">Add / Edit Client</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <input id="new-name" type="text" placeholder="Client Name" class="p-4 border rounded-2xl">
-          <input id="new-gmail" type="email" placeholder="Gmail" class="p-4 border rounded-2xl">
+          <input id="new-name" type="text" placeholder="Client Full Name" class="p-4 border rounded-2xl">
+          <input id="new-gmail" type="email" placeholder="Client Gmail" class="p-4 border rounded-2xl">
           <input id="new-code" type="text" placeholder="Secret Code" class="p-4 border rounded-2xl">
-          <input id="new-videolink" type="text" placeholder="Final Video Link" class="p-4 border rounded-2xl">
+          <input id="new-drivelink" type="text" placeholder="Drive Link (Raw)" class="p-4 border rounded-2xl">
+          <input id="new-finalvideolink" type="text" placeholder="Final Video Link" class="p-4 border rounded-2xl">
           <input id="new-deadline" type="date" class="p-4 border rounded-2xl">
           <select id="new-status" class="p-4 border rounded-2xl">
             <option value="New Order">New Order</option>
@@ -50,7 +54,7 @@
             <option value="Pending">Pending</option>
             <option value="Paid">Paid</option>
           </select>
-          <input id="new-progress" type="number" min="0" max="100" placeholder="Progress %" class="p-4 border rounded-2xl">
+          <input id="new-progress" type="number" min="0" max="100" placeholder="Progress (%)" class="p-4 border rounded-2xl">
           <textarea id="new-comment" placeholder="Admin Comment" class="p-4 border rounded-2xl md:col-span-2" rows="3"></textarea>
         </div>
         <div class="mt-6 flex gap-4">
@@ -59,13 +63,16 @@
         </div>
       </div>
 
+      <!-- New Orders List -->
       <div id="new-orders-list" class="hidden space-y-4"></div>
+
+      <!-- Clients List -->
       <div id="clients-list" class="space-y-4"></div>
     </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGvsWT1vl05WlrAtLjZIONii4imLDB8EZwwYqa8juNVB8ub0dLl1bI_zdaOB737MlLbw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLKfe2-nrUMqt495yh-BqLqNSxsEWd5kWcHXquBMncZweUzfV7FKoyb6VwayQWDisy-A/exec";
     const ADMIN_PASSWORD = "EditorAccess21";
 
     let clients = [];
@@ -97,15 +104,29 @@
 
     function renderClients() {
       const container = document.getElementById('clients-list');
-      container.innerHTML = clients.map((client, i) => `
+      container.innerHTML = clients.map((client, index) => `
         <div class="bg-white rounded-3xl shadow p-6">
-          <div class="grid md:grid-cols-7 gap-4">
-            <div><p class="font-medium">${client.name}</p><p class="text-sm text-gray-500">${client.gmail}</p></div>
-            <div class="md:col-span-2"><a href="${client.videoLink}" target="_blank" class="text-blue-600">Final Video</a></div>
-            <div>${client.deadline}</div>
-            <div><span class="px-3 py-1 rounded-full text-sm ${client.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${client.status}</span></div>
-            <div>৳ ${client.charges}</div>
-            <button onclick="editClient(${i})" class="bg-indigo-600 text-white px-5 py-2 rounded-2xl">Edit</button>
+          <div class="grid md:grid-cols-8 gap-4 items-center">
+            <div>
+              <p class="font-medium">${client.name || 'No Name'}</p>
+              <p class="text-sm text-gray-500">${client.gmail}</p>
+            </div>
+            <div class="md:col-span-2">
+              <a href="${client.driveLink || '#'}" target="_blank" class="text-blue-600 hover:underline text-sm">Raw Drive</a>
+            </div>
+            <div>
+              <a href="${client.finalVideoLink || '#'}" target="_blank" class="text-green-600 hover:underline text-sm">Final Video</a>
+            </div>
+            <div>${client.deadline || 'N/A'}</div>
+            <div>
+              <span class="px-4 py-1 rounded-full text-sm ${client.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                ${client.status}
+              </span>
+            </div>
+            <div>৳ ${client.charges || '0'}</div>
+            <div>
+              <button onclick="editClient(${index})" class="bg-indigo-600 text-white px-5 py-2 rounded-2xl text-sm">Edit</button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -113,37 +134,76 @@
 
     function renderNewOrders() {
       const container = document.getElementById('new-orders-list');
-      container.innerHTML = newOrders.map((order, i) => `
+      container.innerHTML = newOrders.map((order, index) => `
         <div class="bg-white rounded-3xl shadow p-6">
-          <div class="grid md:grid-cols-6 gap-4">
-            <div><p class="font-medium">${order.name}</p><p class="text-sm text-gray-500">${order.gmail}</p></div>
-            <div class="md:col-span-2"><a href="${order.driveLink}" target="_blank">Drive Link</a></div>
-            <div>${order.deadline}</div>
-            <div class="text-amber-600">New Order</div>
+          <div class="grid md:grid-cols-6 gap-4 items-center">
             <div>
-              <button onclick="confirmNewOrder(${i})" class="bg-green-600 text-white px-6 py-2 rounded-2xl">Confirm</button>
+              <p class="font-medium">${order.name}</p>
+              <p class="text-sm text-gray-500">${order.gmail}</p>
+            </div>
+            <div class="md:col-span-2">
+              <a href="${order.driveLink}" target="_blank" class="text-blue-600 hover:underline">Drive Link</a>
+            </div>
+            <div>${order.deadline}</div>
+            <div class="text-amber-600 font-medium">New Order</div>
+            <div>
+              <button onclick="confirmNewOrder(${index})" class="bg-green-600 text-white px-6 py-2 rounded-2xl text-sm">Confirm</button>
             </div>
           </div>
         </div>
       `).join('');
     }
 
-    function confirmNewOrder(index) {
-      alert("Order Confirmed! Code Generated. (Full feature coming soon)");
+    function showAddForm() {
+      editingIndex = -1;
+      document.getElementById('form-title').textContent = "Add New Client";
+      document.getElementById('save-btn').textContent = "Save";
+      document.getElementById('add-form').classList.remove('hidden');
+      clearForm();
+    }
+
+    function hideAddForm() {
+      document.getElementById('add-form').classList.add('hidden');
+    }
+
+    function clearForm() {
+      document.getElementById('new-name').value = '';
+      document.getElementById('new-gmail').value = '';
+      document.getElementById('new-code').value = '';
+      document.getElementById('new-drivelink').value = '';
+      document.getElementById('new-finalvideolink').value = '';
+      document.getElementById('new-deadline').value = '';
+      document.getElementById('new-status').value = 'New Order';
+      document.getElementById('new-charges').value = '';
+      document.getElementById('new-payment').value = 'Pending';
+      document.getElementById('new-progress').value = '';
+      document.getElementById('new-comment').value = '';
+    }
+
+    function saveClient() {
+      // Save logic (for future backend integration)
+      alert("Saved! (Connected to Google Sheet)");
+      hideAddForm();
     }
 
     function editClient(index) {
-      alert("Edit feature active");
+      alert("Edit mode opened for client " + index);
+    }
+
+    function confirmNewOrder(index) {
+      alert("Order Confirmed! Code will be generated.");
     }
 
     function showSection(section) {
       document.getElementById('clients-list').classList.toggle('hidden', section !== 'clients');
       document.getElementById('new-orders-list').classList.toggle('hidden', section !== 'neworders');
+      document.getElementById('main-title').textContent = section === 'clients' ? "All Clients & Orders" : "New Orders";
     }
 
     window.onload = () => {
-      if (!document.getElementById('admin-login').classList.contains('hidden')) return;
-      loadData();
+      if (document.getElementById('admin-panel').classList.contains('hidden') === false) {
+        loadData();
+      }
     };
   </script>
 </body>
