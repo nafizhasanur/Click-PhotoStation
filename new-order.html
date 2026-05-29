@@ -45,12 +45,12 @@
       btn.disabled = true;
 
       const orderData = {
-        name: document.getElementById('order-name').value,
-        gmail: document.getElementById('order-gmail').value,
-        whatsapp: document.getElementById('order-whatsapp').value,
-        driveLink: document.getElementById('order-drive').value,
-        description: document.getElementById('order-description').value,
-        sampleLink: document.getElementById('order-sample').value,
+        name: document.getElementById('order-name').value.trim(),
+        gmail: document.getElementById('order-gmail').value.trim(),
+        whatsapp: document.getElementById('order-whatsapp').value.trim(),
+        driveLink: document.getElementById('order-drive').value.trim(),
+        description: document.getElementById('order-description').value.trim(),
+        sampleLink: document.getElementById('order-sample').value.trim(),
         deadline: document.getElementById('order-deadline').value
       };
 
@@ -67,10 +67,10 @@
           document.getElementById('success-screen').classList.remove('hidden');
           setTimeout(() => window.location.href = "index.html", 2500);
         } else {
-          alert("Error: " + (result.message || "Try again"));
+          alert("Error: " + (result.message || "Please try again"));
         }
       } catch(e) {
-        alert("Connection error. Please check your internet.");
+        alert("Connection error. Please check your internet or contact me.");
       } finally {
         btn.innerHTML = 'Submit Order';
         btn.disabled = false;
