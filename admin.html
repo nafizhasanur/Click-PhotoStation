@@ -24,42 +24,10 @@
       <h1 class="text-2xl font-bold mb-8">Admin Panel</h1>
       <button onclick="showSection('clients')" class="w-full bg-indigo-600 py-3 rounded-xl font-medium mb-3">All Clients</button>
       <button onclick="showSection('neworders')" class="w-full bg-amber-600 py-3 rounded-xl font-medium mb-3">New Orders</button>
-      <button onclick="showAddForm()" class="w-full bg-emerald-600 py-3 rounded-xl font-medium mt-6">+ Create New Order</button>
     </div>
 
     <div class="flex-1 p-8 overflow-auto">
       <h2 id="main-title" class="text-3xl font-bold mb-6">All Clients & Orders</h2>
-
-      <!-- Add / Edit Form -->
-      <div id="add-form" class="hidden bg-white rounded-3xl shadow-xl p-8 mb-8">
-        <h3 id="form-title" class="text-xl font-semibold mb-6">Add / Edit Client</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <input id="new-name" type="text" placeholder="Client Full Name" class="p-4 border rounded-2xl">
-          <input id="new-gmail" type="email" placeholder="Gmail" class="p-4 border rounded-2xl">
-          <input id="new-code" type="text" placeholder="Secret Code" class="p-4 border rounded-2xl">
-          <input id="new-drivelink" type="text" placeholder="Drive Link (Raw)" class="p-4 border rounded-2xl">
-          <input id="new-finalvideolink" type="text" placeholder="Final Video Link" class="p-4 border rounded-2xl">
-          <input id="new-deadline" type="date" class="p-4 border rounded-2xl">
-          <select id="new-status" class="p-4 border rounded-2xl">
-            <option value="New Order">New Order</option>
-            <option value="Pending Customer Confirmation">Pending Confirmation</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-            <option value="Cancel">Cancel</option>
-          </select>
-          <input id="new-charges" type="text" placeholder="Charges (৳)" class="p-4 border rounded-2xl">
-          <select id="new-payment" class="p-4 border rounded-2xl">
-            <option value="Pending">Pending</option>
-            <option value="Paid">Paid</option>
-          </select>
-          <input id="new-progress" type="number" min="0" max="100" placeholder="Progress (%)" class="p-4 border rounded-2xl">
-          <textarea id="new-comment" placeholder="Admin Comment" class="p-4 border rounded-2xl md:col-span-2" rows="3"></textarea>
-        </div>
-        <div class="mt-6 flex gap-4">
-          <button onclick="saveClient()" class="bg-green-600 text-white px-8 py-3 rounded-2xl">Save</button>
-          <button onclick="hideAddForm()" class="bg-gray-500 text-white px-8 py-3 rounded-2xl">Cancel</button>
-        </div>
-      </div>
 
       <div id="new-orders-list" class="hidden space-y-4"></div>
       <div id="clients-list" class="space-y-4"></div>
@@ -67,7 +35,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrkgEsw01jxpiBASEd9iI90y3CnUtr-Gi71xfzqCUqIMbCjPSnEfQy9lDgr0-wBIKSw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwivIwvbrgfBf2eQ6OagIIvmZxucKFv-1N4NFHgN_9Eo8u_eH9ZLtJbLupLpIuKUHma3g/exec";
     const ADMIN_PASSWORD = "EditorAccess21";
 
     let clients = [];
@@ -96,6 +64,21 @@
       }
     }
 
+    function renderNewOrders() {
+      const container = document.getElementById('new-orders-list');
+      container.innerHTML = newOrders.map((o, i) => `
+        <div class="bg-white rounded-3xl shadow p-6">
+          <div class="grid md:grid-cols-6 gap-4 items-center">
+            <div><strong>${o.name}</strong><br>${o.gmail}</div>
+            <div><a href="${o.driveLink}" target="_blank" class="text-blue-600">Drive Link</a></div>
+            <div>${o.deadline}</div>
+            <div class="text-amber-600">New Order</div>
+            <button onclick="confirmNewOrder(${i})" class="bg-green-600 text-white px-6 py-2 rounded-2xl">Confirm</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
     function renderClients() {
       const container = document.getElementById('clients-list');
       container.innerHTML = clients.map((c, i) => `
@@ -114,31 +97,12 @@
       `).join('');
     }
 
-    function renderNewOrders() {
-      const container = document.getElementById('new-orders-list');
-      container.innerHTML = newOrders.map((o, i) => `
-        <div class="bg-white rounded-3xl shadow p-6">
-          <div class="grid md:grid-cols-6 gap-4 items-center">
-            <div><strong>${o.name}</strong><br>${o.gmail}</div>
-            <div><a href="${o.driveLink}" target="_blank" class="text-blue-600">Drive Link</a></div>
-            <div>${o.deadline}</div>
-            <div class="text-amber-600">New Order</div>
-            <button onclick="confirmNewOrder(${i})" class="bg-green-600 text-white px-6 py-2 rounded-2xl">Confirm</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
     function confirmNewOrder(i) {
-      alert("Order Confirmed! Go to All Clients to add Code & Final Video.");
+      alert("✅ Order Confirmed!\nGo to All Clients section to add Code, Final Video Link, Progress etc.");
     }
 
     function editClient(i) {
-      alert("Edit Client - Full feature will be added soon");
-    }
-
-    function showAddForm() {
-      alert("Create New Order from Admin - Feature coming soon");
+      alert("Edit Client " + (i+1) + "\n\nYou can update Final Video, Progress, Status etc.");
     }
 
     function showSection(section) {
