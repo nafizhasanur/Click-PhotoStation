@@ -29,7 +29,7 @@
 
   <div id="success-screen" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
     <div class="text-center text-white">
-      <div class="text-7xl mb-6"></div>
+      <div class="text-7xl mb-6">🎉</div>
       <h2 class="text-4xl font-bold">Thank You!</h2>
       <p class="text-xl mt-3">Your order has been received successfully.</p>
     </div>
@@ -61,16 +61,19 @@
           headers: { 'Content-Type': 'application/json' }
         });
 
+        if (!response.ok) throw new Error("Server error");
+
         const result = await response.json();
 
         if (result.success) {
           document.getElementById('success-screen').classList.remove('hidden');
           setTimeout(() => window.location.href = "index.html", 2500);
         } else {
-          alert("Error: " + (result.message || "Please try again"));
+          alert("Error: " + (result.message || "Try again"));
         }
       } catch(e) {
-        alert("Connection error. Please check your internet or contact me.");
+        console.error(e);
+        alert("Connection error. Please check internet or contact me.");
       } finally {
         btn.innerHTML = 'Submit Order';
         btn.disabled = false;
