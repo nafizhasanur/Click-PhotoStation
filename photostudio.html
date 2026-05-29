@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Edit | Click-PhotoStation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    
+    .service-card {
+      transition: all 0.4s ease;
+    }
+    .service-card:hover {
+      transform: translateY(-12px) scale(1.03);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    .modal {
+      animation: modalPop 0.4s ease forwards;
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.7); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-indigo-600">Click<span class="text-gray-800">PhotoStation</span></h1>
+      
+      <div class="hidden md:flex space-x-8 text-gray-700 font-medium">
+        <a href="index.html" class="hover:text-indigo-600 transition">Home</a>
+        <a href="about.html" class="hover:text-indigo-600 transition">About</a>
+        <a href="portfolio.html" class="hover:text-indigo-600 transition">Our Works</a>
+        <a href="photostudio.html" class="text-indigo-600">Photo Edit</a>
+        <a href="contact.html" class="hover:text-indigo-600 transition">Contact</a>
+      </div>
+      
+      <button id="mobile-menu-btn" class="md:hidden text-2xl">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+    <div class="flex flex-col py-5 px-6 space-y-5 text-gray-700 font-medium">
+      <a href="index.html" class="hover:text-indigo-600">Home</a>
+      <a href="about.html" class="hover:text-indigo-600">About</a>
+      <a href="portfolio.html" class="hover:text-indigo-600">Our Works</a>
+      <a href="photostudio.html" class="hover:text-indigo-600">Photo Edit</a>
+      <a href="contact.html" class="hover:text-indigo-600">Contact</a>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section class="bg-gradient-to-br from-indigo-700 to-gray-900 text-white py-20">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h1 class="text-5xl md:text-6xl font-bold mb-4" data-aos="fade-up">Professional Photo Editing</h1>
+      <p class="text-xl text-gray-200" data-aos="fade-up" data-aos-delay="200">
+        Transform your photos with expert editing services
+      </p>
+    </div>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="py-16 px-6 max-w-6xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-8">
+      
+      <!-- Service 1 -->
+      <div class="service-card bg-white rounded-2xl overflow-hidden shadow-lg cursor-pointer" data-aos="fade-up" onclick="openModal(0)">
+        <img src="images/quickbanner.webp" class="w-full h-64 object-cover">
+        <div class="p-6">
+          <h3 class="text-2xl font-semibold mb-2">Quick</h3>
+          <p class="text-gray-600">Professional skin retouching, eye enhancement, hair fixing, and natural beauty enhancement.</p>
+        </div>
+      </div>
+
+      <!-- Service 2 -->
+      <div class="service-card bg-white rounded-2xl overflow-hidden shadow-lg cursor-pointer" data-aos="fade-up" data-aos-delay="100" onclick="openModal(1)">
+        <img src="images/Dazz Photo Edit.webp" class="w-full h-64 object-cover">
+        <div class="p-6">
+          <h3 class="text-2xl font-semibold mb-2">dazz</h3>
+          <p class="text-gray-600">Background removal, shadow creation, color correction, and e-commerce ready photos.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div id="serviceModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="modal bg-white rounded-3xl max-w-lg w-full mx-4 overflow-hidden">
+      <div class="relative">
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-3xl text-gray-500 hover:text-black">×</button>
+        <img id="modalImage" class="w-full h-72 object-cover">
+      </div>
+      <div class="p-8">
+        <h2 id="modalTitle" class="text-3xl font-bold mb-3"></h2>
+        <p id="modalDesc" class="text-gray-600 leading-relaxed"></p>
+        
+        <div class="mt-8">
+          <a id="editNowBtn" 
+             class="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl text-lg font-medium transition">
+            Edit Now
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    AOS.init({ duration: 1000, once: true });
+
+    const services = [
+      {
+        title: "Portrait Retouching",
+        desc: "Expert Photoshop retouching including skin smoothing, eye brightening, smile enhancement, and natural look perfection.",
+        image: "https://images.unsplash.com/photo-1554080353-a576cf803bda?w=800",
+        editLink: "dazz-photo-edit.html"          // First service link
+      },
+      {
+        title: "Product Photo Editing",
+        desc: "Clean background removal, realistic shadows, color correction, and professional product photos ready for online stores.",
+        image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800",
+        editLink: "https://clickphotostation.netlify.app/quick-photo-edit"   // Second service link
+      }
+    ];
+
+    function openModal(index) {
+      const service = services[index];
+      
+      document.getElementById('modalImage').src = service.image;
+      document.getElementById('modalTitle').textContent = service.title;
+      document.getElementById('modalDesc').textContent = service.desc;
+      document.getElementById('editNowBtn').href = service.editLink;
+      
+      document.getElementById('serviceModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('serviceModal').classList.add('hidden');
+    }
+
+    // Mobile Menu
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-8 text-center">
+    <p>© 2026 Click-PhotoStation. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>
