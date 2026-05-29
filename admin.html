@@ -24,6 +24,7 @@
       <h1 class="text-2xl font-bold mb-8">Admin Panel</h1>
       <button onclick="showSection('clients')" class="w-full bg-indigo-600 py-3 rounded-xl font-medium mb-3">All Clients</button>
       <button onclick="showSection('neworders')" class="w-full bg-amber-600 py-3 rounded-xl font-medium mb-3">New Orders</button>
+      <button onclick="showAddForm()" class="w-full bg-emerald-600 py-3 rounded-xl font-medium mt-6">+ Create New Order</button>
     </div>
 
     <div class="flex-1 p-8 overflow-auto">
@@ -66,7 +67,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI01N-NJkaaf487BJMozTfBxkz0EtwvDxGsbjU3KmJqTHeRKo8Gf-HH_Ni9FGBM3eKKA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrkgEsw01jxpiBASEd9iI90y3CnUtr-Gi71xfzqCUqIMbCjPSnEfQy9lDgr0-wBIKSw/exec";
     const ADMIN_PASSWORD = "EditorAccess21";
 
     let clients = [];
@@ -129,11 +130,15 @@
     }
 
     function confirmNewOrder(i) {
-      alert("Order Confirmed! Please add Code and details.");
+      alert("Order Confirmed! Go to All Clients to add Code & Final Video.");
     }
 
     function editClient(i) {
-      alert("Edit function ready (Full backend coming soon)");
+      alert("Edit Client - Full feature will be added soon");
+    }
+
+    function showAddForm() {
+      alert("Create New Order from Admin - Feature coming soon");
     }
 
     function showSection(section) {
@@ -142,8 +147,9 @@
     }
 
     window.onload = () => {
-      if (!document.getElementById('admin-login').classList.contains('hidden')) return;
-      loadData();
+      if (document.getElementById('admin-panel').classList.contains('hidden') === false) {
+        loadData();
+      }
     };
   </script>
 </body>

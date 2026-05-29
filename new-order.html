@@ -36,7 +36,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI01N-NJkaaf487BJMozTfBxkz0EtwvDxGsbjU3KmJqTHeRKo8Gf-HH_Ni9FGBM3eKKA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrkgEsw01jxpiBASEd9iI90y3CnUtr-Gi71xfzqCUqIMbCjPSnEfQy9lDgr0-wBIKSw/exec";
 
     document.getElementById('order-form').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -70,7 +70,7 @@
           alert("Error: " + (result.message || "Try again"));
         }
       } catch(e) {
-        alert("Connection error. Please check internet or contact me.");
+        alert("Connection error. Please check your internet.");
       } finally {
         btn.innerHTML = 'Submit Order';
         btn.disabled = false;

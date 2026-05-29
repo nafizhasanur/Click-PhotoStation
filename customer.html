@@ -32,9 +32,9 @@
         <p id="progress-text" class="text-center mt-3 font-medium"></p>
       </div>
 
-      <!-- Final Video Link (শুধু 100% হলে) -->
+      <!-- Final Video Link -->
       <div id="final-video-section" class="hidden bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
-        <h4 class="font-semibold text-green-700 mb-3">Your Final Edited Video</h4>
+        <h4 class="font-semibold text-green-700 mb-3">✅ Your Final Edited Video</h4>
         <a id="final-video-link" href="#" target="_blank" class="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-2xl hover:bg-green-700">
           📥 Download Final Video
         </a>
@@ -55,7 +55,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI01N-NJkaaf487BJMozTfBxkz0EtwvDxGsbjU3KmJqTHeRKo8Gf-HH_Ni9FGBM3eKKA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrkgEsw01jxpiBASEd9iI90y3CnUtr-Gi71xfzqCUqIMbCjPSnEfQy9lDgr0-wBIKSw/exec";
 
     const currentClient = JSON.parse(localStorage.getItem('currentClient'));
 
@@ -76,7 +76,6 @@
         document.getElementById('progress-bar').style.width = progress + "%";
         document.getElementById('progress-text').textContent = `${progress}% Completed`;
 
-        // Final Video Link শুধু 100% হলে দেখাবে
         if (progress >= 100 && currentClient.finalVideoLink) {
           document.getElementById('final-video-section').classList.remove('hidden');
           document.getElementById('final-video-link').href = currentClient.finalVideoLink;
